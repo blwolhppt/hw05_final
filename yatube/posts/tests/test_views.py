@@ -5,7 +5,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, Client
 from django.urls import reverse
 
-from ..models import Group, Post, Comment
+from ..models import Group, Post, Comment, Follow
 from ..views import AMOUNT_OF_POSTS
 
 User = get_user_model()
@@ -16,6 +16,7 @@ class PostsViewTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.user = User.objects.create_user(username='test_user')
+        cls.follower = User.objects.create_user(username='follower')
         cls.group = Group.objects.create(
             title='Тестовая группа',
             slug='test_slug',
@@ -58,12 +59,18 @@ class PostsViewTests(TestCase):
             text='Комментарий под постом post_0'
 
         )
+        cls.follow = Follow.objects.create(
+            user=cls.follower,
+            author=cls.user
+        )
 
     def setUp(self):
         self.guest_client = Client()
         self.user = self.__class__.user
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+        self.follower = Client()
+        self.follower.force_login(self.follower)
 
     def test_index_show_correct_context(self):
         """Шаблон index сформирован с правильным контекстом."""
@@ -114,7 +121,7 @@ class PostsViewTests(TestCase):
         self.assertEqual(author, self.user)
 
     def test_post_detail_show_correct_context(self):
-        """Шаблон post_detail сформирован с правильным контекстом."""
+        """Шаблон post_detail сформирован с правильным контекстом(+ком)."""
         response = self.authorized_client.get(
             reverse('posts:post_detail', kwargs={'post_id': self.post_0.id}))
 
