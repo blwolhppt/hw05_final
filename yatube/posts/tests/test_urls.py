@@ -71,4 +71,3 @@ class PostsURLTests(TestCase):
         """Проверка редиректов для guest_client. """
         response = self.guest_client.get('/create/', follow=True)
         self.assertRedirects(response, "/auth/login/?next=/create/")
-
