@@ -70,6 +70,9 @@ class PostsViewTests(TestCase):
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
 
+        self.authorized_follower = Client()
+        self.authorized_follower.force_login(self.follower)
+
     def test_index_show_correct_context(self):
         """Шаблон index сформирован с правильным контекстом."""
         response = self.authorized_client.get(reverse('posts:index'))
@@ -77,8 +80,7 @@ class PostsViewTests(TestCase):
         self.assertIn('page_obj', response.context)
         posts = response.context.get('page_obj').object_list
         expected = list(Post.objects.all())
-        for i in range(len(posts)):
-            self.assertEqual(posts[i], expected[i])
+        self.assertEqual(list(posts), expected)
 
     def test_cache(self):
         """ Тест кэша."""
@@ -169,14 +171,19 @@ class PostsViewTests(TestCase):
 
     def test_following(self):
         """Проверка возможности подписок"""
-        follows = Follow.objects.first()
-        self.assertEqual(follows.user, self.follower)
-        self.assertEqual(follows.author, self.user)
+        self.authorized_follower.get(
+            reverse('posts:profile_follow', args=(self.user,)))
+
+        self.assertTrue(Follow.objects.filter(user=self.follower,
+                                              author=self.user).exists())
 
     def test_unfollowing(self):
         """Проверка возможности отписок"""
-        Follow.objects.all().delete()
-        self.assertEqual(Follow.objects.count(), 0)
+        self.authorized_follower.get(
+            reverse('posts:profile_unfollow', args=(self.user,)))
+
+        self.assertFalse(Follow.objects.filter(user=self.follower,
+                                               author=self.user).exists())
 
 
 class PaginatorViewsTest(TestCase):
