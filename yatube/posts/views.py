@@ -68,15 +68,12 @@ def post_create(request):
         post.save()
         return redirect('posts:profile', username=request.user)
     return render(request, 'posts/create_post.html', {'form': form})
-    groups = Group.objects.all()
     context = {
         'form': form,
-        'groups': groups,
     }
     return render(request, 'posts/create_post.html', context)
 
 
-# @login_required
 def post_edit(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     if post.author != request.user:
@@ -107,7 +104,6 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
-    # информация о текущем пользователе доступна в переменной request.user
     follow = Follow.objects.filter(user=request.user).values_list(
         "author_id", flat=True
     )
@@ -124,9 +120,8 @@ def follow_index(request):
 @login_required
 def profile_follow(request, username):
     author = get_object_or_404(User, username=username)
-    if author != request.user and (not Follow.objects.filter(
-            user=request.user, author=author).exists()):
-        Follow.objects.create(user=request.user, author=author)
+    if author != request.user:
+        Follow.objects.get_or_create(user=request.user, author=author)
     return redirect("posts:index")
 
 
