@@ -84,13 +84,13 @@ class PostsViewTests(TestCase):
 
     def test_cache(self):
         """ Тест кэша."""
-        response_first = self.guest_client.get(reverse('posts:index')).content
+        response_new = self.guest_client.get(reverse('posts:index')).content
         self.post_1.delete()
-        response_second = self.guest_client.get(reverse('posts:index')).content
-        self.assertEqual(response_first, response_second)
+        response_delete = self.guest_client.get(reverse('posts:index')).content
+        self.assertEqual(response_new, response_delete)
         cache.clear()
-        response_third = self.guest_client.get(reverse('posts:index')).content
-        self.assertNotEqual(response_first, response_third)
+        response_cache = self.guest_client.get(reverse('posts:index')).content
+        self.assertNotEqual(response_new, response_cache)
 
     def test_group_posts_page_show_correct_context(self):
         """Шаблон group_list сформирован с правильным контекстом."""
