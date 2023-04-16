@@ -77,18 +77,18 @@ class PostsViewTests(TestCase):
         self.assertIn('page_obj', response.context)
         posts = response.context.get('page_obj').object_list
         expected = list(Post.objects.all())
-        self.assertEqual(posts[0], expected[0])
-        self.assertEqual(posts[1], expected[1])
+        for i in range(len(posts)):
+            self.assertEqual(posts[i], expected[i])
 
     def test_cache(self):
         """ Тест кэша."""
-        response1 = self.guest_client.get(reverse('posts:index')).content
+        response_first = self.guest_client.get(reverse('posts:index')).content
         self.post_1.delete()
-        response2 = self.guest_client.get(reverse('posts:index')).content
-        self.assertEqual(response1, response2)
+        response_second = self.guest_client.get(reverse('posts:index')).content
+        self.assertEqual(response_first, response_second)
         cache.clear()
-        response3 = self.guest_client.get(reverse('posts:index')).content
-        self.assertNotEqual(response1, response3)
+        response_third = self.guest_client.get(reverse('posts:index')).content
+        self.assertNotEqual(response_first, response_third)
 
     def test_group_posts_page_show_correct_context(self):
         """Шаблон group_list сформирован с правильным контекстом."""
@@ -175,7 +175,6 @@ class PostsViewTests(TestCase):
 
     def test_unfollowing(self):
         """Проверка возможности отписок"""
-        # print(Follow.objects.count())
         Follow.objects.all().delete()
         self.assertEqual(Follow.objects.count(), 0)
 
