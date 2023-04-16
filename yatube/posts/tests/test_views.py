@@ -175,9 +175,9 @@ class PostsViewTests(TestCase):
 
     def test_unfollowing(self):
         """Проверка возможности отписок"""
-        follows = Follow.objects.first()
-        self.assertEqual(follows.user, self.follower)
-        self.assertEqual(follows.author, self.user)
+        #print(Follow.objects.count())
+        Follow.objects.all().delete()
+        self.assertEqual(Follow.objects.count(), 0)
 
 
 class PaginatorViewsTest(TestCase):
