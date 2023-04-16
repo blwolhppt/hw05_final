@@ -3,7 +3,6 @@ from django.test import Client, TestCase
 from django.urls import reverse
 
 from ..models import Post, Group, User
-from django.db.models.fields.files import ImageFieldFile
 
 
 class PostFormTests(TestCase):
@@ -70,7 +69,7 @@ class PostFormTests(TestCase):
             'group': self.group.id,
             'image': uploaded.name,
         }
-        #print(uploaded.name)
+        # print(uploaded.name)
         response = self.authorized_client.post(
             reverse('posts:post_create'),
             data=form_data,
@@ -80,7 +79,7 @@ class PostFormTests(TestCase):
         self.assertRedirects(response,
                              reverse('posts:profile',
                                      kwargs={'username': self.user.username}))
-        #print(form_data)
+        # print(form_data)
         self.assertTrue(Post.objects.filter(text='Тестовый пост(картинка)',
                                             author=self.user,
                                             group=self.group).exists())

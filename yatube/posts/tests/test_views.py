@@ -175,7 +175,7 @@ class PostsViewTests(TestCase):
 
     def test_unfollowing(self):
         """Проверка возможности отписок"""
-        #print(Follow.objects.count())
+        # print(Follow.objects.count())
         Follow.objects.all().delete()
         self.assertEqual(Follow.objects.count(), 0)
 
