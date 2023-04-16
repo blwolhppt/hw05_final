@@ -69,8 +69,6 @@ class PostsViewTests(TestCase):
         self.user = self.__class__.user
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
-        self.follower = Client()
-        self.follower.force_login(self.follower)
 
     def test_index_show_correct_context(self):
         """Шаблон index сформирован с правильным контекстом."""
@@ -168,6 +166,18 @@ class PostsViewTests(TestCase):
         response = self.guest_client.get('/nonexist-page/')
         self.assertEqual(response.status_code, 404)
         self.assertTemplateUsed(response, 'core/404.html')
+
+    def test_following(self):
+        """Проверка возможности подписок"""
+        follows = Follow.objects.first()
+        self.assertEqual(follows.user, self.follower)
+        self.assertEqual(follows.author, self.user)
+
+    def test_unfollowing(self):
+        """Проверка возможности отписок"""
+        follows = Follow.objects.first()
+        self.assertEqual(follows.user, self.follower)
+        self.assertEqual(follows.author, self.user)
 
 
 class PaginatorViewsTest(TestCase):
